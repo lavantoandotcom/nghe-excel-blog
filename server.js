@@ -2,6 +2,9 @@ require('dotenv').config();
 const express = require('express');
 const path    = require('path');
 const { createClient } = require('@supabase/supabase-js');
+const { marked }       = require('marked');
+
+marked.setOptions({ breaks: true, gfm: true });
 
 const app  = express();
 const PORT = process.env.PORT || 3002;
@@ -64,17 +67,26 @@ function thumbIconSvg(type) {
   return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="14" y2="17"/></svg>';
 }
 
-// Convert Editor.js JSON content → HTML
+// Render post content → HTML. Supports: Editor.js JSON, Markdown, plain text
 function editorJsToHtml(content) {
   if (!content) return '<p>Nội dung đang được cập nhật...</p>';
 
-  let blocks;
-  try {
-    const parsed = typeof content === 'string' ? JSON.parse(content) : content;
-    blocks = parsed.blocks ?? [];
-  } catch {
-    // Not Editor.js JSON — treat as plain text
-    return `<p>${escHtml(content)}</p>`;
+  let blocks = null;
+  if (typeof content === 'object' && content !== null) {
+    blocks = content.blocks ?? null;
+  } else if (typeof content === 'string') {
+    const trimmed = content.trim();
+    if (trimmed.startsWith('{')) {
+      try {
+        const parsed = JSON.parse(trimmed);
+        blocks = parsed.blocks ?? null;
+      } catch { /* not JSON — fall through to markdown */ }
+    }
+  }
+
+  if (!blocks) {
+    // Render as markdown (supports GFM: headings, bold, lists, tables, code, links)
+    return marked.parse(String(content));
   }
 
   return blocks.map(block => {
