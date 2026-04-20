@@ -13,6 +13,9 @@ const supabase = createClient(
 
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Health check — không phụ thuộc Supabase
+app.get('/health', (_req, res) => res.status(200).send('ok'));
+
 // ── Helpers ───────────────────────────────────────────────────────
 function formatDate(iso) {
   if (!iso) return '';
