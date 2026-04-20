@@ -11,6 +11,6 @@
     "@supabase/supabase-js": "^2.49.4",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
-    "marked": "^18.0.2"
+    "marked": "^4.3.0"
   }
 }
