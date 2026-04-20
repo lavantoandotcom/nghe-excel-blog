@@ -169,17 +169,32 @@ function layout({ title, description, ogImage, canonical, bodyHtml }) {
   <div class="container">
     <nav class="nav" aria-label="Navigation chính">
       <a href="/" class="nav__logo" aria-label="Nghề Excel Blog — Trang chủ">
+        <img src="/logo_blog.jpg" alt="Nghề Excel" width="40" height="40"/>
         <span class="nav__logo-text">Nghề <span>Excel</span></span>
       </a>
       <ul class="nav__links" role="list">
-        <li><a href="/#bai-viet" class="nav__link">Bài viết</a></li>
-        <li><a href="/#video"    class="nav__link">Video</a></li>
-        <li><a href="/#bai-tap"  class="nav__link">Bài tập</a></li>
-        <li><a href="/#chu-de"   class="nav__link">Chủ đề</a></li>
-        <li><a href="https://ngheexcel.com" class="nav__link" target="_blank" rel="noopener">Khoá học</a></li>
+        <li class="nav__item nav__item--dropdown">
+          <button class="nav__link nav__link--btn" aria-expanded="false" aria-haspopup="true" id="seriesBtn">
+            Series bài viết
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <ul class="nav__dropdown" role="menu" id="seriesDropdown">
+            <li><a href="/?series=excel-co-ban"   class="nav__dropdown-link" role="menuitem">Excel cơ bản</a></li>
+            <li><a href="/?series=excel-nang-cao"  class="nav__dropdown-link" role="menuitem">Excel nâng cao</a></li>
+            <li><a href="/?series=thu-thuat-excel" class="nav__dropdown-link" role="menuitem">Thủ thuật Excel</a></li>
+            <li><a href="/?series=kinh-nghiem-excel" class="nav__dropdown-link" role="menuitem">Kinh nghiệm Excel</a></li>
+          </ul>
+        </li>
+        <li><a href="https://ngheexcel.com" class="nav__link nav__link--course" target="_blank" rel="noopener">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          30 Ngày học &amp; thực hành Excel
+        </a></li>
       </ul>
       <div class="nav__actions">
-        <a href="/#nhan-tai-lieu" class="nav__cta">Nhận tài liệu miễn phí</a>
+        <form class="nav__search" action="/" method="get" role="search">
+          <svg class="nav__search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input class="nav__search-input" type="search" name="q" placeholder="Tìm bài viết..." aria-label="Tìm kiếm bài viết"/>
+        </form>
         <button class="nav__burger" aria-label="Mở menu" aria-expanded="false" id="burgerBtn">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
         </button>
@@ -187,12 +202,24 @@ function layout({ title, description, ogImage, canonical, bodyHtml }) {
     </nav>
   </div>
   <div class="nav__drawer" id="mobileDrawer" role="navigation">
-    <a href="/#bai-viet" class="nav__link">Bài viết</a>
-    <a href="/#video"    class="nav__link">Video</a>
-    <a href="/#bai-tap"  class="nav__link">Bài tập</a>
-    <a href="/#chu-de"   class="nav__link">Chủ đề</a>
-    <a href="https://ngheexcel.com" class="nav__link" target="_blank" rel="noopener">Khoá học</a>
-    <a href="/#nhan-tai-lieu" class="nav__cta">Nhận tài liệu miễn phí</a>
+    <form class="nav__search nav__search--mobile" action="/" method="get" role="search">
+      <svg class="nav__search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input class="nav__search-input" type="search" name="q" placeholder="Tìm bài viết..." aria-label="Tìm kiếm bài viết"/>
+    </form>
+    <button class="nav__link nav__drawer-series-toggle" id="drawerSeriesToggle">
+      Series bài viết
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div class="nav__drawer-submenu" id="drawerSubmenu" hidden>
+      <a href="/?series=excel-co-ban"     class="nav__link nav__link--sub">Excel cơ bản</a>
+      <a href="/?series=excel-nang-cao"   class="nav__link nav__link--sub">Excel nâng cao</a>
+      <a href="/?series=thu-thuat-excel"  class="nav__link nav__link--sub">Thủ thuật Excel</a>
+      <a href="/?series=kinh-nghiem-excel" class="nav__link nav__link--sub">Kinh nghiệm Excel</a>
+    </div>
+    <a href="https://ngheexcel.com" class="nav__link nav__link--course" target="_blank" rel="noopener">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      30 Ngày học &amp; thực hành Excel
+    </a>
   </div>
 </header>
 
@@ -204,15 +231,16 @@ ${bodyHtml}
     <div class="footer__grid">
       <div>
         <div class="footer__brand-logo">
+          <img src="/logo_blog.jpg" alt="Nghề Excel" width="40" height="40"/>
           <span class="footer__brand-logo-text">Nghề <span>Excel</span></span>
         </div>
         <p class="footer__brand-desc">Nền tảng học Excel thực chiến bằng tiếng Việt. Từ hàm cơ bản đến dashboard nâng cao — tất cả đều có lời giải chi tiết.</p>
         <div class="footer__socials">
-          <a href="#" class="footer__social" aria-label="YouTube Nghề Excel">
-            <svg viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" style="fill:var(--brand-dark)"/></svg>
+          <a href="https://www.youtube.com/@ngheexcel" class="footer__social" aria-label="YouTube Nghề Excel" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
           </a>
-          <a href="#" class="footer__social" aria-label="Facebook Nghề Excel">
-            <svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+          <a href="https://www.threads.com/@ngheexcel" class="footer__social" aria-label="Threads Nghề Excel" target="_blank" rel="noopener">
+            <svg viewBox="0 0 192 192" fill="currentColor"><path d="M141.537 88.988a66.667 66.667 0 0 0-2.518-1.143c-1.482-27.307-16.403-42.94-41.457-43.1h-.34c-14.986 0-27.449 6.396-35.12 18.036l13.779 9.452c5.73-8.695 14.724-10.548 21.348-10.548h.23c8.248.054 14.474 2.452 18.502 7.13 2.932 3.405 4.893 8.11 5.864 14.05-7.314-1.243-15.224-1.626-23.68-1.14-23.82 1.371-39.134 15.264-38.105 34.568.522 9.792 5.4 18.216 13.735 23.719 7.047 4.652 16.124 6.927 25.557 6.412 12.458-.683 22.231-5.436 29.05-14.127 5.177-6.6 8.452-15.153 9.898-25.93 5.937 3.583 10.337 8.298 12.767 13.966 4.132 9.635 4.373 25.468-8.546 38.376-11.319 11.308-24.925 16.2-45.488 16.35-22.809-.169-40.06-7.484-51.275-21.742C35.236 139.966 29.808 120.682 29.605 96c.203-24.682 5.63-43.966 16.133-57.317C56.954 24.425 74.204 17.11 97.013 16.94c22.975.17 40.526 7.52 52.171 21.847 5.739 7.003 10.07 15.662 12.918 25.725l16.146-4.32c-3.44-12.68-8.853-23.606-16.219-32.668C147.036 9.607 125.202.195 97.07 0h-.113C68.882.195 47.292 9.65 32.788 28.08 19.882 44.485 13.224 67.315 13.001 96c.223 28.685 6.88 51.515 19.788 67.92 14.504 18.43 36.094 27.884 64.208 28.08h.113c24.303-.168 41.412-6.525 55.552-20.653 18.796-18.779 18.26-42.234 12.053-56.629-4.474-10.423-12.964-18.956-23.178-25.73zm-29.55 47.044c-4.888 5.86-12.122 9.048-21.443 9.562-9.716.533-19.207-2.426-25.363-7.936-3.97-3.568-5.987-8.29-5.748-13.264.452-8.506 8.472-17.952 28.928-19.127 2.534-.145 5.017-.215 7.45-.215 5.906 0 11.445.527 16.525 1.542-1.886 11.716-5.564 21.459-10.349 29.438z"/></svg>
           </a>
         </div>
       </div>
@@ -262,6 +290,32 @@ ${bodyHtml}
     drawer.classList.remove('is-open');
     burger.setAttribute('aria-expanded', 'false');
   }));
+
+  // Desktop dropdown
+  const seriesBtn = document.getElementById('seriesBtn');
+  const seriesDropdown = document.getElementById('seriesDropdown');
+  if (seriesBtn && seriesDropdown) {
+    seriesBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const open = seriesDropdown.classList.toggle('is-open');
+      seriesBtn.setAttribute('aria-expanded', String(open));
+    });
+    document.addEventListener('click', () => {
+      seriesDropdown.classList.remove('is-open');
+      seriesBtn.setAttribute('aria-expanded', 'false');
+    });
+  }
+
+  // Mobile drawer submenu
+  const drawerSeriesToggle = document.getElementById('drawerSeriesToggle');
+  const drawerSubmenu = document.getElementById('drawerSubmenu');
+  if (drawerSeriesToggle && drawerSubmenu) {
+    drawerSeriesToggle.addEventListener('click', () => {
+      const open = !drawerSubmenu.hidden;
+      drawerSubmenu.hidden = open;
+      drawerSeriesToggle.classList.toggle('is-open', !open);
+    });
+  }
 
   if ('IntersectionObserver' in window) {
     const obs = new IntersectionObserver(entries => {
@@ -381,7 +435,6 @@ app.get('/', async (req, res) => {
             Đọc bài viết
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
           </a>
-          <a href="#bai-viet" class="hero__btn-ghost">Xem tất cả bài</a>
         </div>
       </div>
       <div class="hero__card" aria-hidden="true">
@@ -424,7 +477,7 @@ app.get('/', async (req, res) => {
       <div class="stat-divider"></div>
       <div class="stat">
         <div class="stat__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
-        <div class="stat__info"><span class="stat__num">15,000+</span><span class="stat__label">Học viên theo dõi</span></div>
+        <div class="stat__info"><span class="stat__num">8,000+</span><span class="stat__label">Học viên theo dõi</span></div>
       </div>
     </div>
   </div>
@@ -435,7 +488,6 @@ app.get('/', async (req, res) => {
   <div class="container">
     <div class="section-header">
       <div>
-        <p class="section-label">Nội dung mới nhất</p>
         <h2 class="section-title" id="content-heading">Bài viết &amp; Video mới</h2>
       </div>
     </div>
@@ -462,44 +514,27 @@ app.get('/', async (req, res) => {
   </div>
 </section>
 
-<!-- TOPICS -->
-${allTags.length ? `
-<section class="topics-section" id="chu-de" aria-labelledby="topics-heading">
-  <div class="container">
-    <div class="section-header">
-      <div>
-        <p class="section-label">Khám phá theo chủ đề</p>
-        <h2 class="section-title" id="topics-heading">Học theo chủ đề bạn cần</h2>
-      </div>
-    </div>
-    <nav class="topics-grid">
-      ${allTags.map(tag => `<a href="/?tag=${encodeURIComponent(tag)}" class="topic-pill reveal">${escHtml(tag)}</a>`).join('')}
-    </nav>
-  </div>
-</section>` : ''}
-
 <!-- NEWSLETTER -->
 <section class="newsletter-section" id="nhan-tai-lieu">
   <div class="container">
     <div class="newsletter-inner">
       <div>
-        <p class="newsletter-label">Miễn phí 100%</p>
-        <h2 class="newsletter-title">Nhận <span>Tài Liệu Excel</span><br>Miễn Phí Mỗi Tuần</h2>
-        <p class="newsletter-desc">Đăng ký để nhận bài viết mới, video hướng dẫn và bộ bài tập Excel được tuyển chọn kỹ mỗi tuần.</p>
+        <h2 class="newsletter-title">Nhận <span>Tài Liệu Excel</span><br>Miễn Phí</h2>
+        <p class="newsletter-desc">Đăng ký để nhận bài viết mới, video hướng dẫn và bộ bài tập Excel được tuyển chọn kỹ lưỡng.</p>
       </div>
       <div>
         <div class="newsletter-perks">
           <div class="newsletter-perk">
-            <div class="newsletter-perk__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg></div>
-            <span class="newsletter-perk__text">Cheat sheet 50 hàm Excel thông dụng nhất (PDF)</span>
+            <div class="newsletter-perk__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+            <span class="newsletter-perk__text">Bộ bài tập có lời giải ôn luyện phỏng vấn</span>
           </div>
           <div class="newsletter-perk">
-            <div class="newsletter-perk__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/></svg></div>
-            <span class="newsletter-perk__text">Template dashboard Excel sẵn dùng (file .xlsx)</span>
+            <div class="newsletter-perk__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 7h-3V4a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v3H4a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg></div>
+            <span class="newsletter-perk__text">Bộ bài tập có lời giải theo các chuyên ngành</span>
           </div>
           <div class="newsletter-perk">
             <div class="newsletter-perk__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg></div>
-            <span class="newsletter-perk__text">Video hướng dẫn độc quyền cho subscriber</span>
+            <span class="newsletter-perk__text">70 video học cấp tốc Excel cơ bản</span>
           </div>
         </div>
         <form class="newsletter-form" id="newsletterForm">
@@ -507,7 +542,6 @@ ${allTags.length ? `
           <input type="email" id="email-input" name="email" placeholder="email@cuaban.com" autocomplete="email" required/>
           <button type="submit">Nhận tài liệu</button>
         </form>
-        <p class="newsletter-note">Không spam. Bỏ đăng ký bất cứ lúc nào.</p>
       </div>
     </div>
   </div>
