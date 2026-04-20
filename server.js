@@ -159,6 +159,9 @@ function layout({ title, description, ogImage, canonical, bodyHtml }) {
   <meta property="og:type"        content="website"/>
   <meta property="og:locale"      content="vi_VN"/>
   ${canonical ? `<link rel="canonical" href="${escHtml(canonical)}"/>` : ''}
+  <!-- Favicon -->
+  <link rel="icon" type="image/jpeg" href="/logo_blog.jpg"/>
+  <link rel="apple-touch-icon" href="/logo_blog.jpg"/>
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
