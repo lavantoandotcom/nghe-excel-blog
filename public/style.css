@@ -854,10 +854,11 @@ input { font: inherit; }
 }
 .post-layout__inner {
   display: grid;
-  grid-template-columns: 1fr 300px;
+  grid-template-columns: minmax(0, 1fr) 300px;
   gap: 48px;
   align-items: start;
 }
+.post-layout__inner > main { min-width: 0; }
 
 /* Post content body (rendered from Editor.js) */
 .post-content {
@@ -865,6 +866,9 @@ input { font: inherit; }
   border: 1px solid var(--border);
   border-radius: var(--r-lg);
   padding: 40px 48px;
+  max-width: 100%;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
   font-size: 17px;
   line-height: 1.78;
   color: var(--ink-2);
@@ -903,11 +907,15 @@ input { font: inherit; }
   padding: 22px 26px;
   overflow-x: auto;
   margin-bottom: 1.5em;
+  max-width: 100%;
+  -webkit-overflow-scrolling: touch;
 }
 .post-content pre code {
   background: none; border: none; padding: 0;
   color: rgba(255,255,255,.85);
   font-size: .9em; line-height: 1.65;
+  white-space: pre;
+  word-break: normal;
 }
 .post-content blockquote {
   border-left: 4px solid var(--green);
@@ -928,9 +936,13 @@ input { font: inherit; }
   text-align: center; font-size: 13px; color: var(--ink-4);
   margin-top: 8px; font-style: italic;
 }
+/* Wrap tables in a horizontal scroll container on narrow screens */
 .post-content table {
   width: 100%; border-collapse: collapse;
   margin-bottom: 1.5em; font-size: .92em;
+  display: block; overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
 }
 .post-content th, .post-content td {
   padding: 10px 14px;
@@ -1033,7 +1045,7 @@ input { font: inherit; }
   .exercises-grid { grid-template-columns: repeat(2, 1fr); }
   .footer__grid { grid-template-columns: 1fr 1fr; gap: 32px; }
   .newsletter-inner { gap: 40px; }
-  .post-layout__inner { grid-template-columns: 1fr; }
+  .post-layout__inner { grid-template-columns: minmax(0, 1fr); }
   .post-sidebar { position: static; }
 }
 @media (max-width: 768px) {
@@ -1093,7 +1105,11 @@ input { font: inherit; }
 
   .footer__grid { grid-template-columns: 1fr; gap: 24px; }
   .newsletter-inner { grid-template-columns: 1fr; gap: 28px; }
-  .post-content { padding: 26px 22px; font-size: 16px; }
+  .post-content { padding: 22px 18px; font-size: 15.5px; }
+  .post-content h2 { font-size: 1.4em; }
+  .post-content h3 { font-size: 1.18em; }
+  .post-content pre { padding: 16px 18px; font-size: .85em; }
+  .post-layout { padding: 32px 0 56px; }
 }
 @media (max-width: 480px) {
   .container { padding: 0 14px; }
