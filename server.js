@@ -9,9 +9,13 @@ marked.setOptions({ breaks: true, gfm: true });
 const app  = express();
 const PORT = process.env.PORT || 3002;
 
+if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ANON_KEY) {
+  console.warn('[warning] Missing SUPABASE_URL or SUPABASE_ANON_KEY env var — database routes will fail but /health will still respond.');
+}
+
 const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_ANON_KEY
+  process.env.SUPABASE_URL     || 'https://placeholder.supabase.co',
+  process.env.SUPABASE_ANON_KEY || 'placeholder'
 );
 
 app.use(express.static(path.join(__dirname, 'public')));
@@ -708,6 +712,8 @@ app.get('/post/:slug', async (req, res) => {
 });
 
 // ── Start ─────────────────────────────────────────────────────────
-app.listen(PORT, () => {
-  console.log(`\n  Blog Nghề Excel đang chạy tại http://localhost:${PORT}\n`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`\n  Blog Nghề Excel đang chạy tại http://0.0.0.0:${PORT}`);
+  console.log(`  SUPABASE_URL: ${process.env.SUPABASE_URL ? 'set' : 'MISSING'}`);
+  console.log(`  SUPABASE_ANON_KEY: ${process.env.SUPABASE_ANON_KEY ? 'set' : 'MISSING'}\n`);
 });
