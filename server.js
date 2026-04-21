@@ -385,9 +385,13 @@ function postCardHtml(post, wide = false) {
 
   const wideClass = wide ? ' post-card--wide' : '';
 
+  const thumbInner = post.banner_url
+    ? `<img src="${escHtml(post.banner_url)}" alt="${escHtml(post.title)}" loading="lazy"/>`
+    : `<div class="thumb-placeholder ${thumbClass(post.type)}">${thumbIconSvg(post.type)}</div>`;
+
   return `<article class="post-card${wideClass} reveal">
   <a href="${postUrl(post)}" class="post-card__thumb" tabindex="-1" aria-hidden="true">
-    <div class="thumb-placeholder ${thumbClass(post.type)}">${thumbIconSvg(post.type)}</div>
+    ${thumbInner}
     ${videoOverlay}${dlBadge}
   </a>
   <div class="post-card__body">
@@ -459,11 +463,11 @@ app.get('/', async (req, res) => {
           </a>
         </div>
       </div>
-      <div class="hero__card" aria-hidden="true">
+      <a href="${heroHref}" class="hero__card">
         <div class="hero__card-thumb">
-          <span class="hero__card-thumb-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>
-          </span>
+          ${featured?.banner_url
+            ? `<img src="${escHtml(featured.banner_url)}" alt="${escHtml(featured.title)}"/>`
+            : `<span class="hero__card-thumb-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg></span>`}
         </div>
         <div class="hero__card-body">
           <div class="hero__card-badge">${featured ? badgeHtml(featured.type) : '<span class="badge badge--green">Bài viết</span>'}</div>
@@ -473,7 +477,7 @@ app.get('/', async (req, res) => {
             ${featured ? `<span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>${formatDate(featured.created_at)}</span>` : ''}
           </div>
         </div>
-      </div>
+      </a>
     </div>
   </div>
 </section>
@@ -662,9 +666,13 @@ app.get('/post/:slug', async (req, res) => {
        </div>`
     : '';
 
+  const heroBannerBlock = post.banner_url
+    ? `<div class="post-hero__banner"><img src="${escHtml(post.banner_url)}" alt="${escHtml(post.title)}"/></div>`
+    : '';
+
   const bodyHtml = `
 <!-- POST HERO -->
-<section class="post-hero">
+<section class="post-hero${post.banner_url ? ' post-hero--has-banner' : ''}">
   <div class="container">
     <div class="post-hero__inner">
       <nav class="breadcrumb" aria-label="Breadcrumb">
@@ -678,6 +686,7 @@ app.get('/post/:slug', async (req, res) => {
       <h1 class="post-hero__title">${escHtml(post.title)}</h1>
       ${post.excerpt ? `<p class="post-hero__excerpt">${escHtml(post.excerpt)}</p>` : ''}
       <div class="post-hero__meta">${metaItems}</div>
+      ${heroBannerBlock}
     </div>
   </div>
 </section>
