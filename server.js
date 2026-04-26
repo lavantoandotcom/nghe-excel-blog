@@ -90,6 +90,17 @@ function escHtml(str) {
 const SITE_URL  = process.env.SITE_URL  || 'https://blog.ngheexcel.com';
 const SITE_NAME = 'Nghề Excel Blog';
 
+// Build link to the main course site with UTM tracking
+// so we can see which blog CTA actually drives traffic.
+function courseUrl(medium, campaign = 'blog_cta') {
+  const params = new URLSearchParams({
+    utm_source:   'blog',
+    utm_medium:   medium,
+    utm_campaign: campaign,
+  });
+  return `https://ngheexcel.com/?${params.toString()}`;
+}
+
 function stripHtml(input) {
   if (!input) return '';
   let text = String(input);
@@ -331,7 +342,7 @@ function layout({
             <li><a href="/?series=kinh-nghiem-excel" class="nav__dropdown-link" role="menuitem">Kinh nghiệm Excel</a></li>
           </ul>
         </li>
-        <li><a href="https://ngheexcel.com" class="nav__link nav__link--course" target="_blank" rel="noopener">
+        <li><a href="${courseUrl('nav', 'desktop_cta')}" class="nav__link nav__link--course" target="_blank" rel="noopener">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
           30 Ngày học &amp; thực hành Excel
         </a></li>
@@ -341,7 +352,7 @@ function layout({
           <svg class="nav__search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           <input class="nav__search-input" type="search" name="q" placeholder="Tìm bài viết..." aria-label="Tìm kiếm bài viết"/>
         </form>
-        <a href="https://ngheexcel.com" class="nav__pill-cta" target="_blank" rel="noopener" aria-label="Khóa học 30 ngày học và thực hành Excel">
+        <a href="${courseUrl('pill', 'mobile_cta')}" class="nav__pill-cta" target="_blank" rel="noopener" aria-label="Khóa học 30 ngày học và thực hành Excel">
           <svg class="nav__pill-cta-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
           <span class="nav__pill-cta-text">30 ngày Excel</span>
         </a>
@@ -366,7 +377,7 @@ function layout({
       <a href="/?series=thu-thuat-excel"  class="nav__link nav__link--sub">Thủ thuật Excel</a>
       <a href="/?series=kinh-nghiem-excel" class="nav__link nav__link--sub">Kinh nghiệm Excel</a>
     </div>
-    <a href="https://ngheexcel.com" class="nav__link nav__link--course" target="_blank" rel="noopener">
+    <a href="${courseUrl('drawer', 'mobile_drawer')}" class="nav__link nav__link--course" target="_blank" rel="noopener">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
       30 Ngày học &amp; thực hành Excel
     </a>
@@ -375,7 +386,7 @@ function layout({
 
 <!-- Mobile bottom sticky CTA bar -->
 <aside class="course-bar" id="courseBar" role="complementary" aria-label="Đề xuất khóa học 30 ngày Excel" hidden>
-  <a class="course-bar__link" href="https://ngheexcel.com" target="_blank" rel="noopener">
+  <a class="course-bar__link" href="${courseUrl('sticky_bar', 'mobile_cta')}" target="_blank" rel="noopener">
     <span class="course-bar__icon" aria-hidden="true">
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
     </span>
@@ -433,7 +444,7 @@ ${bodyHtml}
       <div>
         <h3 class="footer__col-title">Về chúng tôi</h3>
         <ul class="footer__links">
-          <li><a href="https://ngheexcel.com" class="footer__link" target="_blank" rel="noopener">Khoá học Excel</a></li>
+          <li><a href="${courseUrl('footer', 'footer_cta')}" class="footer__link" target="_blank" rel="noopener">Khoá học Excel</a></li>
           <li><a href="/#nhan-tai-lieu" class="footer__link">Nhận tài liệu miễn phí</a></li>
         </ul>
       </div>
@@ -932,7 +943,7 @@ app.get('/post/:slug', async (req, res) => {
         <div class="sidebar-cta">
           <p class="sidebar-cta__title">Học Excel chuyên nghiệp cùng Nghề Excel</p>
           <p class="sidebar-cta__desc">Khoá học từ cơ bản đến nâng cao, có bài tập thực hành và hỗ trợ trực tiếp.</p>
-          <a href="https://ngheexcel.com" class="sidebar-cta__btn" target="_blank" rel="noopener">Xem khoá học →</a>
+          <a href="${courseUrl('sidebar_cta', 'post_detail')}" class="sidebar-cta__btn" target="_blank" rel="noopener">Xem khoá học →</a>
         </div>
       </aside>
     </div>
