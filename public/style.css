@@ -1159,3 +1159,141 @@ input { font: inherit; }
   .stat__icon { width: 32px; height: 32px; }
   .stat__icon svg { width: 15px; height: 15px; }
 }
+
+/* ───────────────────────────────────────────────────────────────────
+   Mobile course CTAs — header pill + bottom sticky bar
+   ─────────────────────────────────────────────────────────────────── */
+
+/* Pill button — hidden on desktop by default */
+.nav__pill-cta {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: var(--green);
+  color: #fff;
+  border-radius: 999px;
+  font-family: var(--ff-head);
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: transform 150ms ease, box-shadow 300ms ease;
+  box-shadow: 0 0 0 0 rgba(22, 163, 74, 0);
+  -webkit-tap-highlight-color: transparent;
+}
+.nav__pill-cta:active { transform: scale(0.96); }
+.nav__pill-cta-icon { flex-shrink: 0; }
+.nav__pill-cta-text { letter-spacing: 0.2px; }
+
+@keyframes navPillPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.55); }
+  50%      { box-shadow: 0 0 0 8px rgba(22, 163, 74, 0); }
+}
+
+/* Bottom sticky course bar */
+.course-bar {
+  display: none; /* desktop hidden */
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 90;
+  background: var(--green);
+  color: #fff;
+  padding: 12px 16px;
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.18);
+  transform: translateY(110%);
+  transition: transform 250ms ease-out;
+}
+.course-bar.is-visible { transform: translateY(0); }
+.course-bar__link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: inherit;
+  text-decoration: none;
+  padding-right: 36px; /* leave room for close button */
+  -webkit-tap-highlight-color: transparent;
+}
+.course-bar__icon {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 10px;
+}
+.course-bar__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+.course-bar__title {
+  font-family: var(--ff-head);
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1.25;
+  color: #fff;
+}
+.course-bar__sub {
+  font-size: 11px;
+  line-height: 1.3;
+  color: rgba(255, 255, 255, 0.82);
+  font-weight: 500;
+}
+.course-bar__arrow {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.16);
+  border-radius: 50%;
+  transition: transform 200ms ease;
+}
+.course-bar__link:active .course-bar__arrow { transform: translateX(2px); }
+.course-bar__close {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  background: transparent;
+  border: 0;
+  color: #fff;
+  opacity: 0.6;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: opacity 150ms ease;
+}
+.course-bar__close:hover,
+.course-bar__close:focus-visible { opacity: 1; outline: none; }
+.course-bar__close:focus-visible { box-shadow: 0 0 0 2px #fff inset; }
+
+@media (max-width: 768px) {
+  .nav__pill-cta {
+    display: inline-flex;
+    margin-right: 4px;
+    animation: navPillPulse 4s ease-out infinite;
+  }
+  /* Khi pill xuất hiện, ẩn text logo để dành chỗ */
+  .nav__logo-text { display: none; }
+
+  .course-bar { display: block; }
+
+  /* Tránh bar che footer khi cuộn xuống đáy */
+  body { padding-bottom: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav__pill-cta { animation: none; transition: none; }
+  .course-bar { transition: none; }
+}

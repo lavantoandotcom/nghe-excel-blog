@@ -333,6 +333,10 @@ function layout({
           <svg class="nav__search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           <input class="nav__search-input" type="search" name="q" placeholder="Tìm bài viết..." aria-label="Tìm kiếm bài viết"/>
         </form>
+        <a href="https://ngheexcel.com" class="nav__pill-cta" target="_blank" rel="noopener" aria-label="Khóa học 30 ngày học và thực hành Excel">
+          <svg class="nav__pill-cta-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+          <span class="nav__pill-cta-text">30 ngày Excel</span>
+        </a>
         <button class="nav__burger" aria-label="Mở menu" aria-expanded="false" id="burgerBtn">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
         </button>
@@ -360,6 +364,25 @@ function layout({
     </a>
   </div>
 </header>
+
+<!-- Mobile bottom sticky CTA bar -->
+<aside class="course-bar" id="courseBar" role="complementary" aria-label="Đề xuất khóa học 30 ngày Excel" hidden>
+  <a class="course-bar__link" href="https://ngheexcel.com" target="_blank" rel="noopener">
+    <span class="course-bar__icon" aria-hidden="true">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+    </span>
+    <span class="course-bar__text">
+      <strong class="course-bar__title">30 ngày học Excel thực chiến</strong>
+      <span class="course-bar__sub">Chỉ từ 5 phút/ngày · 200+ bài tập có lời giải</span>
+    </span>
+    <span class="course-bar__arrow" aria-hidden="true">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </span>
+  </a>
+  <button class="course-bar__close" id="courseBarClose" aria-label="Đóng đề xuất khóa học" type="button">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  </button>
+</aside>
 
 ${bodyHtml}
 
@@ -454,6 +477,43 @@ ${bodyHtml}
       drawerSeriesToggle.classList.toggle('is-open', !open);
     });
   }
+
+  // Mobile bottom CTA bar — show after user scrolls past hero
+  (function () {
+    const bar = document.getElementById('courseBar');
+    const closeBtn = document.getElementById('courseBarClose');
+    if (!bar || !closeBtn) return;
+    const dismissed = sessionStorage.getItem('courseBarDismissed') === '1';
+    if (dismissed) return;
+    let ticking = false;
+    let isVisible = false;
+    function update() {
+      ticking = false;
+      const shouldShow = window.scrollY > 300 && window.matchMedia('(max-width: 768px)').matches;
+      if (shouldShow && !isVisible) {
+        bar.hidden = false;
+        // next frame to allow display change before transition
+        requestAnimationFrame(() => bar.classList.add('is-visible'));
+        isVisible = true;
+      } else if (!shouldShow && isVisible) {
+        bar.classList.remove('is-visible');
+        isVisible = false;
+      }
+    }
+    function onScroll() {
+      if (!ticking) { requestAnimationFrame(update); ticking = true; }
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    closeBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      sessionStorage.setItem('courseBarDismissed', '1');
+      bar.classList.remove('is-visible');
+      setTimeout(() => { bar.hidden = true; }, 250);
+      window.removeEventListener('scroll', onScroll);
+    });
+  })();
 
   if ('IntersectionObserver' in window) {
     const obs = new IntersectionObserver(entries => {
