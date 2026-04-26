@@ -502,7 +502,7 @@ function postCardHtml(post, wide = false) {
   const wideClass = wide ? ' post-card--wide' : '';
 
   const thumbInner = post.banner_url
-    ? `<img src="${escHtml(post.banner_url)}" alt="${escHtml(post.title)}" loading="lazy"/>`
+    ? `<img src="${escHtml(post.banner_url)}" alt="${escHtml(post.banner_alt || post.title)}" loading="lazy"/>`
     : `<div class="thumb-placeholder ${thumbClass(post.type)}">${thumbIconSvg(post.type)}</div>`;
 
   return `<article class="post-card${wideClass} reveal">
@@ -582,7 +582,7 @@ app.get('/', async (req, res) => {
       <a href="${heroHref}" class="hero__card">
         <div class="hero__card-thumb">
           ${featured?.banner_url
-            ? `<img src="${escHtml(featured.banner_url)}" alt="${escHtml(featured.title)}"/>`
+            ? `<img src="${escHtml(featured.banner_url)}" alt="${escHtml(featured.banner_alt || featured.title)}"/>`
             : `<span class="hero__card-thumb-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg></span>`}
         </div>
         <div class="hero__card-body">
@@ -808,6 +808,16 @@ app.get('/post/:slug', async (req, res) => {
       : '',
   ].filter(Boolean).join('');
 
+  // SEO + image-alt with fallbacks
+  const postUrlAbs = `${SITE_URL}/post/${post.slug}`;
+  const cleanDesc  = truncate(
+    post.meta_description || post.excerpt || stripHtml(post.content) || `Bài viết về ${post.title} từ Nghề Excel.`,
+    160
+  );
+  const ogImg      = post.banner_url || `${SITE_URL}/logo_blog.jpg`;
+  const bannerAlt  = post.banner_alt || post.title;
+  const tagsArr    = Array.isArray(post.tags) ? post.tags : [];
+
   // Video embed block for video posts
   const videoBlock = isVideo && post.video_url
     ? `<div class="video-embed" style="margin-bottom:32px">
@@ -816,7 +826,7 @@ app.get('/post/:slug', async (req, res) => {
     : '';
 
   const heroBannerBlock = post.banner_url
-    ? `<div class="post-hero__banner"><img src="${escHtml(post.banner_url)}" alt="${escHtml(post.title)}"/></div>`
+    ? `<div class="post-hero__banner"><img src="${escHtml(post.banner_url)}" alt="${escHtml(bannerAlt)}"/></div>`
     : '';
 
   const bodyHtml = `
@@ -860,11 +870,6 @@ app.get('/post/:slug', async (req, res) => {
     </div>
   </div>
 </div>`;
-
-  const postUrlAbs = `${SITE_URL}/post/${post.slug}`;
-  const cleanDesc  = truncate(post.excerpt || stripHtml(post.content) || `Bài viết về ${post.title} từ Nghề Excel.`, 160);
-  const ogImg      = post.banner_url || `${SITE_URL}/logo_blog.jpg`;
-  const tagsArr    = Array.isArray(post.tags) ? post.tags : [];
 
   const articleType = isVideo ? 'VideoObject' : 'BlogPosting';
   const postJsonLd = {
