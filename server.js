@@ -23,6 +23,54 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Health check — không phụ thuộc Supabase
 app.get('/health', (_req, res) => res.status(200).send('ok'));
 
+// ── robots.txt ────────────────────────────────────────────────────
+app.get('/robots.txt', (_req, res) => {
+  res.type('text/plain').send(
+`User-agent: *
+Allow: /
+Disallow: /health
+
+Sitemap: ${SITE_URL}/sitemap.xml
+`);
+});
+
+// ── sitemap.xml ───────────────────────────────────────────────────
+app.get('/sitemap.xml', async (_req, res) => {
+  const { data: posts, error } = await supabase
+    .from('posts')
+    .select('slug, updated_at, created_at')
+    .eq('status', 'published')
+    .order('updated_at', { ascending: false });
+
+  if (error) {
+    console.error('[sitemap] Supabase error:', error.message);
+    return res.status(500).send('sitemap error');
+  }
+
+  const today = new Date().toISOString().slice(0, 10);
+  const urls = [
+    { loc: `${SITE_URL}/`, lastmod: today, changefreq: 'daily',  priority: '1.0' },
+    ...(posts ?? []).map(p => ({
+      loc: `${SITE_URL}/post/${p.slug}`,
+      lastmod: (p.updated_at || p.created_at || today).slice(0, 10),
+      changefreq: 'weekly',
+      priority: '0.8',
+    })),
+  ];
+
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls.map(u => `  <url>
+    <loc>${escHtml(u.loc)}</loc>
+    <lastmod>${u.lastmod}</lastmod>
+    <changefreq>${u.changefreq}</changefreq>
+    <priority>${u.priority}</priority>
+  </url>`).join('\n')}
+</urlset>`;
+
+  res.type('application/xml').send(xml);
+});
+
 // ── Helpers ───────────────────────────────────────────────────────
 function formatDate(iso) {
   if (!iso) return '';
@@ -37,6 +85,41 @@ function escHtml(str) {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
+}
+
+const SITE_URL  = process.env.SITE_URL  || 'https://blog.ngheexcel.com';
+const SITE_NAME = 'Nghề Excel Blog';
+
+function stripHtml(input) {
+  if (!input) return '';
+  let text = String(input);
+  if (text.trim().startsWith('{')) {
+    try {
+      const parsed = JSON.parse(text);
+      if (parsed.blocks) {
+        text = parsed.blocks
+          .map(b => b.data?.text || b.data?.code || (b.data?.items ?? []).join(' ') || '')
+          .join(' ');
+      }
+    } catch { /* ignore */ }
+  }
+  return text
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function truncate(text, max = 160) {
+  if (!text) return '';
+  if (text.length <= max) return text;
+  const cut = text.slice(0, max);
+  const lastSpace = cut.lastIndexOf(' ');
+  return (lastSpace > 0 ? cut.slice(0, lastSpace) : cut) + '…';
 }
 
 function postUrl(post) {
@@ -158,9 +241,31 @@ function editorJsToHtml(content) {
 }
 
 // ── Shared layout ─────────────────────────────────────────────────
-function layout({ title, description, ogImage, canonical, bodyHtml }) {
-  const desc = description || 'Bài viết, video hướng dẫn và bài tập Excel có lời giải từ Nghề Excel.';
-  const og   = ogImage || 'https://blog.ngheexcel.com/og-default.jpg';
+function layout({
+  title,
+  description,
+  ogImage,
+  ogType = 'website',
+  canonical,
+  keywords,
+  author = 'Nghề Excel',
+  publishedTime,
+  modifiedTime,
+  jsonLd,
+  bodyHtml,
+}) {
+  const desc = truncate(description || 'Bài viết, video hướng dẫn và bài tập Excel có lời giải từ Nghề Excel.', 160);
+  const og   = ogImage || `${SITE_URL}/logo_blog.jpg`;
+  const url  = canonical || SITE_URL;
+  const articleMeta = ogType === 'article' ? `
+  ${publishedTime ? `<meta property="article:published_time" content="${escHtml(publishedTime)}"/>` : ''}
+  ${modifiedTime  ? `<meta property="article:modified_time"  content="${escHtml(modifiedTime)}"/>`  : ''}
+  <meta property="article:author" content="${escHtml(author)}"/>` : '';
+  const jsonLdScript = jsonLd
+    ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd])
+        .map(obj => `<script type="application/ld+json">${JSON.stringify(obj).replace(/</g, '\\u003c')}</script>`)
+        .join('\n  ')
+    : '';
   return `<!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -168,13 +273,24 @@ function layout({ title, description, ogImage, canonical, bodyHtml }) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>${escHtml(title)}</title>
   <meta name="description" content="${escHtml(desc)}"/>
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1"/>
+  <meta name="author" content="${escHtml(author)}"/>
+  ${keywords ? `<meta name="keywords" content="${escHtml(keywords)}"/>` : ''}
   <!-- Open Graph — for Facebook, Zalo share -->
   <meta property="og:title"       content="${escHtml(title)}"/>
   <meta property="og:description" content="${escHtml(desc)}"/>
   <meta property="og:image"       content="${escHtml(og)}"/>
-  <meta property="og:type"        content="website"/>
-  <meta property="og:locale"      content="vi_VN"/>
+  <meta property="og:url"         content="${escHtml(url)}"/>
+  <meta property="og:type"        content="${escHtml(ogType)}"/>
+  <meta property="og:site_name"   content="${escHtml(SITE_NAME)}"/>
+  <meta property="og:locale"      content="vi_VN"/>${articleMeta}
+  <!-- Twitter Card -->
+  <meta name="twitter:card"        content="summary_large_image"/>
+  <meta name="twitter:title"       content="${escHtml(title)}"/>
+  <meta name="twitter:description" content="${escHtml(desc)}"/>
+  <meta name="twitter:image"       content="${escHtml(og)}"/>
   ${canonical ? `<link rel="canonical" href="${escHtml(canonical)}"/>` : ''}
+  ${jsonLdScript}
   <!-- Favicon -->
   <link rel="icon" type="image/jpeg" href="/logo_blog.jpg"/>
   <link rel="apple-touch-icon" href="/logo_blog.jpg"/>
@@ -593,10 +709,43 @@ app.get('/', async (req, res) => {
   });
 </script>`;
 
+  const homeJsonLd = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebSite',
+        '@id': `${SITE_URL}/#website`,
+        url: SITE_URL,
+        name: SITE_NAME,
+        description: 'Học Excel thực chiến — bài viết, video, bài tập có lời giải.',
+        inLanguage: 'vi-VN',
+        potentialAction: {
+          '@type': 'SearchAction',
+          target: { '@type': 'EntryPoint', urlTemplate: `${SITE_URL}/?q={search_term_string}` },
+          'query-input': 'required name=search_term_string',
+        },
+      },
+      {
+        '@type': 'Organization',
+        '@id': `${SITE_URL}/#organization`,
+        name: 'Nghề Excel',
+        url: 'https://ngheexcel.com',
+        logo: `${SITE_URL}/logo_blog.jpg`,
+        sameAs: [
+          'https://www.youtube.com/@ngheexcel',
+          'https://www.threads.com/@ngheexcel',
+        ],
+      },
+    ],
+  };
+
   res.send(layout({
-    title: 'Blog — Nghề Excel | Học Excel từ cơ bản đến nâng cao',
+    title: 'Blog Nghề Excel — Học Excel từ cơ bản đến nâng cao',
     description: 'Bài viết, video hướng dẫn và bài tập Excel có lời giải từ Nghề Excel. Học Excel thực chiến, áp dụng ngay vào công việc.',
-    canonical: 'https://blog.ngheexcel.com',
+    canonical: SITE_URL,
+    ogType: 'website',
+    keywords: 'học excel, hàm excel, vlookup, pivot table, dashboard, bài tập excel, video excel, nghề excel',
+    jsonLd: homeJsonLd,
     bodyHtml,
   }));
 });
@@ -712,10 +861,53 @@ app.get('/post/:slug', async (req, res) => {
   </div>
 </div>`;
 
+  const postUrlAbs = `${SITE_URL}/post/${post.slug}`;
+  const cleanDesc  = truncate(post.excerpt || stripHtml(post.content) || `Bài viết về ${post.title} từ Nghề Excel.`, 160);
+  const ogImg      = post.banner_url || `${SITE_URL}/logo_blog.jpg`;
+  const tagsArr    = Array.isArray(post.tags) ? post.tags : [];
+
+  const articleType = isVideo ? 'VideoObject' : 'BlogPosting';
+  const postJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': articleType,
+    headline: post.title,
+    description: cleanDesc,
+    image: ogImg,
+    datePublished: post.created_at,
+    dateModified: post.updated_at || post.created_at,
+    author: { '@type': 'Person', name: post.author || 'Nghề Excel' },
+    publisher: {
+      '@type': 'Organization',
+      name: 'Nghề Excel',
+      logo: { '@type': 'ImageObject', url: `${SITE_URL}/logo_blog.jpg` },
+    },
+    mainEntityOfPage: { '@type': 'WebPage', '@id': postUrlAbs },
+    inLanguage: 'vi-VN',
+    ...(tagsArr.length ? { keywords: tagsArr.join(', ') } : {}),
+    ...(isVideo && post.video_url ? { contentUrl: post.video_url, embedUrl: post.video_url.replace('watch?v=', 'embed/') } : {}),
+  };
+
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Trang chủ',  item: SITE_URL },
+      { '@type': 'ListItem', position: 2, name: isVideo ? 'Video' : isExercise ? 'Bài tập' : 'Bài viết', item: `${SITE_URL}/#bai-viet` },
+      { '@type': 'ListItem', position: 3, name: post.title,    item: postUrlAbs },
+    ],
+  };
+
   res.send(layout({
-    title: `${post.title} — Nghề Excel`,
-    description: post.excerpt || `Bài viết về ${post.title} từ Nghề Excel.`,
-    canonical: `https://blog.ngheexcel.com/post/${post.slug}`,
+    title: `${post.title} | Nghề Excel`,
+    description: cleanDesc,
+    canonical: postUrlAbs,
+    ogType: 'article',
+    ogImage: ogImg,
+    keywords: tagsArr.join(', ') || undefined,
+    author: post.author || 'Nghề Excel',
+    publishedTime: post.created_at,
+    modifiedTime: post.updated_at || post.created_at,
+    jsonLd: [postJsonLd, breadcrumbJsonLd],
     bodyHtml,
   }));
 });
