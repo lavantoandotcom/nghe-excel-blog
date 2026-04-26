@@ -904,13 +904,9 @@ app.get('/post/:slug', async (req, res) => {
        </div>`
     : '';
 
-  const heroBannerBlock = post.banner_url
-    ? `<div class="post-hero__banner"><img src="${escHtml(post.banner_url)}" alt="${escHtml(bannerAlt)}"/></div>`
-    : '';
-
   const bodyHtml = `
 <!-- POST HERO -->
-<section class="post-hero${post.banner_url ? ' post-hero--has-banner' : ''}">
+<section class="post-hero">
   <div class="container">
     <div class="post-hero__inner">
       <nav class="breadcrumb" aria-label="Breadcrumb">
@@ -924,7 +920,6 @@ app.get('/post/:slug', async (req, res) => {
       <h1 class="post-hero__title">${escHtml(post.title)}</h1>
       ${post.excerpt ? `<p class="post-hero__excerpt">${escHtml(post.excerpt)}</p>` : ''}
       <div class="post-hero__meta">${metaItems}</div>
-      ${heroBannerBlock}
     </div>
   </div>
 </section>
